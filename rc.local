@@ -11,25 +11,17 @@
 #
 # By default this script does nothing.
 
-#############################################################################
+################################################################################################################################
 # Export control of a GPIO to userspace by writing its number to this 'export' file.
 # http://www.kernel.org/doc/Documentation/gpio.txt
-#############################################################################
-
-# GPIO0
+################################################################################################################################
 echo 17 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio17/direction && echo "falling" > /sys/class/gpio/gpio17/edge
-# GPIO1
 echo 18 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio18/direction && echo "falling" > /sys/class/gpio/gpio18/edge
-# GPIO2
 echo 21 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio21/direction && echo "falling" > /sys/class/gpio/gpio21/edge
-# GPIO3
 echo 22 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio22/direction && echo "falling" > /sys/class/gpio/gpio22/edge
-# GPIO4
 echo 23 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio23/direction && echo "falling" > /sys/class/gpio/gpio23/edge
-# GPIO5
 echo 24 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio24/direction && echo "falling" > /sys/class/gpio/gpio24/edge
-
-#############################################################################
+################################################################################################################################
 
 # Print the IP address
 _IP=$(hostname -I) || true
@@ -38,4 +30,3 @@ if [ "$_IP" ]; then
 fi
 
 exit 0
-
