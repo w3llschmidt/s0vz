@@ -1,16 +1,17 @@
-s0vz
-====
+s0vz - PROTOTYPE - dont use at this time!
+=========================================
 
-S0/Impulse to Volkszaehler 'RaspberryPI deamon'.
-
+DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.  
+  
 Version 0.2
 
-sudo gcc -o /usr/sbin/s0vz /home/pi/s0vz/s0vz.c -lconfig -lcurl
+Hardware by Udo S.  
+http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung
 
-https://github.com/w3llschmidt/s0vz.git  
+![My image](http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_s0_2.png?w=300)
+
+Backend-Software  
 https://github.com/volkszaehler/volkszaehler.org.git  
-
-Henrik Wellschmidt  <w3llschmidt@gmail.com>  
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,3 +25,18 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Installation
+============
+
+Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) + libcurl4-gnutls-dev + libconfig-dev
+
+s0vz.c 	 	-> /tmp ( sudo gcc -o /usr/sbin/s0vz /tmp/s0vz.c -lconfig -lcurl )
+
+s0vz.cfg	 	-> /etc/  
+
+modules   	-> /etc/  
+
+rc.local  	-> /etc/  
+
+s0vz 	 	-> /etc/init.d/
