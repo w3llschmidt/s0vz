@@ -7,10 +7,10 @@ Version 0.2
 
 sudo gcc -o /usr/sbin/s0vz /home/pi/s0vz/s0vz.c -lconfig -lcurl
 
-https://github.com/w3llschmidt/s0vz.git
-https://github.com/volkszaehler/volkszaehler.org.git
+https://github.com/w3llschmidt/s0vz.git  
+https://github.com/volkszaehler/volkszaehler.org.git  
 
-Henrik Wellschmidt  <w3llschmidt@gmail.com>
+Henrik Wellschmidt  <w3llschmidt@gmail.com>  
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
