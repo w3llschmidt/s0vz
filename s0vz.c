@@ -282,9 +282,9 @@ int main(void)
 		// S0 starts here!
 		char buffer[BUF_LEN];
 		char vzuuid[36];
-		int inputs = 6;
-		struct pollfd fds[inputs];
-		char gpio_pin_id[][6] = {"17", "18", "21", "22", "23", "24"};
+		char gpio_pin_id[][3] = {"17", "18", "21", "22", "23", "24"};
+		int inputs = sizeof(gpio_pin_id)/3;
+                struct pollfd fds[inputs];
 		int i;
 		
 			for (i=0; i<inputs; i++) 
