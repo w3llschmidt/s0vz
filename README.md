@@ -1,7 +1,7 @@
 s0vz - PROTOTYPE - dont use at this time!
 =========================================
 
-DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.  
+S0/Impulse to Volkszaehler 'RaspberryPI deamon'.  
   
 Version 0.2
 
