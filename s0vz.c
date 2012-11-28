@@ -282,17 +282,18 @@ int main(void)
 		// S0 starts here!
 		char buffer[BUF_LEN];
 		char vzuuid[36];
-		char gpio_pin_id[][3] = {"17", "18", "21", "22", "23", "24"};
-		int inputs = sizeof(gpio_pin_id)/3;
-                struct pollfd fds[inputs];
+		char gpio_pin_id[] = { 17, 18, 21, 22, 23, 24 };
+		int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
+		struct pollfd fds[inputs];
 		int i;
 		
 			for (i=0; i<inputs; i++) 
 			{
+
 				char buffer[BUF_LEN];
-				snprintf ( buffer, BUF_LEN, "/sys/class/gpio/gpio%s/value", gpio_pin_id[i] );
-				
+				snprintf ( buffer, BUF_LEN, "/sys/class/gpio/gpio%d/value", gpio_pin_id[i] );
 				if((fds[i].fd = open( buffer, O_RDONLY )) ==-1)
+
 				{
 					syslog(LOG_INFO,"Error:%s (%m)", buffer);
 				}
@@ -317,9 +318,10 @@ int main(void)
 					if (fds[i].revents & POLLPRI)
 					{
 						int in = read(fds[i].fd, buffer, BUF_LEN);
-					
+
 						sprintf(vzuuid, "%d", fds[i].fd);
 						http_post(vzuuid);
+						
 					}
 				}
 			}
