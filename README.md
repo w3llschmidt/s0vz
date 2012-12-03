@@ -38,3 +38,7 @@ s0vz.cfg	 	-> /etc/
 rc.local  	-> /etc/  ( ! add this settings, dont overwrite your exisiting rc.local ! )
 
 s0vz 	 	-> /etc/init.d/ ( start/stop/restart )
+
+============
+
+s0vz.bin  -> Precompiled executable! Copy to /usr/sbin/s0vz  
