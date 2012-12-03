@@ -53,9 +53,6 @@ int pidFilehandle, vzport, i;
 
 const char *vzserver, *vzpath, *vzuuid[6];
 
-//const char *vzuuid[6];
-
-// GPIOs festlegen und Anzahl berrechnen
 char gpio_pin_id[] = { 17, 18, 21, 22, 23, 24 };
 int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
 
