@@ -1,4 +1,4 @@
-s0vz - PROTOTYPE - dont use at this time!
+s0vz - BETA - use at your own risk!
 =========================================
 
 S0/Impulse to Volkszaehler 'RaspberryPI deamon'.  
@@ -35,8 +35,6 @@ s0vz.c 	 	-> /tmp ( sudo gcc -o /usr/sbin/s0vz /tmp/s0vz.c -lconfig -lcurl )
 
 s0vz.cfg	 	-> /etc/  
 
-modules   	-> /etc/  
+rc.local  	-> /etc/  ( ! add this settings, dont overwrite your rc.local ! )
 
-rc.local  	-> /etc/  
-
-s0vz 	 	-> /etc/init.d/
+s0vz 	 	-> /etc/init.d/ ( start/stop/restart )
