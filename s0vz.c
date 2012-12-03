@@ -49,9 +49,15 @@ void daemonShutdown();
 void signal_handler(int sig);
 void daemonize(char *rundir, char *pidfile);
 
-int pidFilehandle, vzport;
+int pidFilehandle, vzport, i;
 
 const char *vzserver, *vzpath;
+
+const char *vzuuid[6];
+
+// GPIOs festlegen und Anzahl berrechnen
+char gpio_pin_id[] = { 17, 18, 21, 22, 23, 24 };
+int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
 
 void signal_handler(int sig)
 {
@@ -214,11 +220,19 @@ int cfile(void)
 	}
 	else
 	syslog(LOG_INFO, "VzPath:%s", vzpath);
+
+	for (i=0; i<inputs; i++)
+	{
+		char gpio[BUF_LEN];
+		sprintf ( gpio, "GPIO%01d", i );
+		if ( config_lookup_string( &cfg, gpio, &vzuuid[i]) == CONFIG_TRUE )
+		syslog ( LOG_INFO, "%s = %s", gpio, vzuuid[i] );
+	}
+	
+	return ( EXIT_SUCCESS );
 }
 
-
-
-int http_post(char *vzuuid)
+int http_post(vzuuid)
 {
         char format[] = "http://%s:%d/%s/data/%s.json";
         char url[sizeof format+128];
@@ -258,7 +272,6 @@ int http_post(char *vzuuid)
 		return ( EXIT_SUCCESS );
 }
 
-
 int main(void)
 {
 
@@ -281,19 +294,13 @@ int main(void)
 
 		// S0 starts here!
 		char buffer[BUF_LEN];
-		char vzuuid[36];
-		char gpio_pin_id[] = { 17, 18, 21, 22, 23, 24 };
-		int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
 		struct pollfd fds[inputs];
-		int i;
-		
+				
 			for (i=0; i<inputs; i++) 
 			{
-
 				char buffer[BUF_LEN];
 				snprintf ( buffer, BUF_LEN, "/sys/class/gpio/gpio%d/value", gpio_pin_id[i] );
 				if((fds[i].fd = open( buffer, O_RDONLY )) ==-1)
-
 				{
 					syslog(LOG_INFO,"Error:%s (%m)", buffer);
 				}
@@ -318,9 +325,7 @@ int main(void)
 					if (fds[i].revents & POLLPRI)
 					{
 						int in = read(fds[i].fd, buffer, BUF_LEN);
-
-						sprintf(vzuuid, "%d", fds[i].fd);
-						http_post(vzuuid);
+						http_post(vzuuid[i]);
 						
 					}
 				}
