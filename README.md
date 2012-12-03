@@ -1,4 +1,4 @@
-s0vz - PROTOTYPE - dont use at this time!
+s0vz - BETA - use at your own risk!
 =========================================
 
 S0/Impulse to Volkszaehler 'RaspberryPI deamon'.  
