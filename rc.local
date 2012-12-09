@@ -1,29 +1,4 @@
-#################################################################################################################################
-#
 # S0/Impulse to Volkszaehler 'RaspberryPI deamon'.
-#
-# Version 0.2
-#
-# https://github.com/w3llschmidt/s0vz.git
-# https://github.com/volkszaehler/volkszaehler.org.git
-#
-# Henrik Wellschmidt <w3llschmidt@gmail.com>
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-################################################################################################################################
-
 echo 17 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio17/direction && echo "falling" > /sys/class/gpio/gpio17/edge
 echo 18 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio18/direction && echo "falling" > /sys/class/gpio/gpio18/edge
 echo 21 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio21/direction && echo "falling" > /sys/class/gpio/gpio21/edge
@@ -31,5 +6,5 @@ echo 22 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio22/direction
 echo 23 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio23/direction && echo "falling" > /sys/class/gpio/gpio23/edge
 echo 24 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio24/direction && echo "falling" > /sys/class/gpio/gpio24/edge
 
-################################################################################################################################
+
 
