@@ -1,4 +1,5 @@
-# S0/Impulse to Volkszaehler 'RaspberryPI deamon'.
+# S0/Impulse to Volkszaehler 'RaspberryPI deamon'
+
 echo 17 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio17/direction && echo "falling" > /sys/class/gpio/gpio17/edge
 echo 18 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio18/direction && echo "falling" > /sys/class/gpio/gpio18/edge
 echo 21 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio21/direction && echo "falling" > /sys/class/gpio/gpio21/edge
