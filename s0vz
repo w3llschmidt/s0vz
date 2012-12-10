@@ -2,8 +2,8 @@
 # Provides: s0vz
 # Required-Start: $ALL
 # Required-Stop: 
-# Default-Start: 3
-# Default-Stop:
+# Default-Start: 2 3 4 5
+# Default-Stop: 1
 # Short-Description: S0/Impulse to Volkszaehler 'RaspberryPI deamon'.
 #### END INIT INFO
 
