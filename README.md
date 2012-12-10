@@ -46,8 +46,8 @@ $ sudo insserv s0vz ( register new service )
 
 $ sudo vim /etc/s0vz.cfg ( edit your config )
 
-$ /etc/init.d/s0vz start ( start the service as user, dont be root! )
+Reboot and check '/var/log/syslog' for outputs! 
 
-Check '/var/log/syslog' for outputs!  
+
 
 
