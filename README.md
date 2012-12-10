@@ -44,4 +44,15 @@ Precompiled executable
 
 s0vz.bin  -> Copy to /usr/sbin/s0vz  
 
+Configuration
+=============
+
+$ sudo insserv s0vz ( register new service )
+
+$ sudo vim /etc/s0vz.cfg ( edit your config )
+
+$ /etc/init.d/s0vz start ( start the service as user, dont be root! )
+
+Check '/var/log/syslog' for outputs!  
+
 
