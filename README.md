@@ -1,7 +1,7 @@
 s0vz - BETA - use at your own risk!
 =========================================
 
-S0/Impulse to Volkszaehler 'RaspberryPI deamon'.  
+S0/Impulse to Volkszaehler 'RaspberryPI daemon'.  
   
 Version 0.2
 
