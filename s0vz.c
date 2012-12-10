@@ -36,9 +36,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <libconfig.h>
 #include <stddef.h>
-#include <poll.h>
 #include <sys/ioctl.h>
 #include <curl/curl.h>
+#include <poll.h>
 
 #define DAEMON_NAME "s0vz"
 #define DAEMON_VERSION "0.2"
@@ -56,8 +56,8 @@ const char *vzserver, *vzpath, *vzuuid[6];
 char gpio_pin_id[] = { 17, 18, 21, 22, 23, 24 };
 int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
 
-void signal_handler(int sig)
-{
+void signal_handler(int sig) {
+
 	switch(sig)
 	{
 		case SIGHUP:
@@ -75,14 +75,14 @@ void signal_handler(int sig)
 	}
 }
 
-void daemonShutdown()
-{
+
+void daemonShutdown() {
 		close(pidFilehandle);
 		remove("/tmp/1wirevz.pid");
 }
 
-void daemonize(char *rundir, char *pidfile)
-{
+
+void daemonize(char *rundir, char *pidfile) {
 	int pid, sid, i;
 	char str[10];
 	struct sigaction newSigAction;
@@ -169,8 +169,8 @@ void daemonize(char *rundir, char *pidfile)
 	write(pidFilehandle, str, strlen(str));
 }
 
-int cfile(void)
-{
+
+int cfile(void) {
 	config_t cfg;
 	config_setting_t *setting;
 	config_init(&cfg);
@@ -225,12 +225,12 @@ int cfile(void)
 		if ( config_lookup_string( &cfg, gpio, &vzuuid[i]) == CONFIG_TRUE )
 		syslog ( LOG_INFO, "%s = %s", gpio, vzuuid[i] );
 	}
-	
-	return ( EXIT_SUCCESS );
+
+return ( EXIT_SUCCESS );
 }
 
-int http_post(vzuuid)
-{
+
+int http_post(vzuuid) {
         char format[] = "http://%s:%d/%s/data/%s.json";
         char url[sizeof format+128];
 
@@ -269,8 +269,8 @@ int http_post(vzuuid)
 		return ( EXIT_SUCCESS );
 }
 
-int main(void)
-{
+
+int main(void) {
 
 	// Dont talk, just kiss!
 	fclose(stdout);
