@@ -1,6 +1,5 @@
 s0vz - S0/Impulse to Volkszaehler 'RaspberryPI daemon'. 
 =========================================
-  
 Version 0.2 (Beta)
 
 Hardware by Udo S.  
