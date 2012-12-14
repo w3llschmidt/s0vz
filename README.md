@@ -1,7 +1,7 @@
 s0vz - BETA - use at your own risk!
 =========================================
 
-S0/Impulse to Volkszaehler 'RaspberryPI deamon'.  
+S0/Impulse to Volkszaehler 'RaspberryPI daemon'.  
   
 Version 0.2
 
@@ -39,11 +39,6 @@ rc.local  	-> /etc/  ( ! add this settings, dont overwrite your exisiting rc.loc
 
 s0vz 	 	-> /etc/init.d/ ( start/stop/restart )
 
-Precompiled executable
-======================
-
-s0vz.bin  -> Copy to /usr/sbin/s0vz  
-
 Configuration
 =============
 
@@ -51,8 +46,8 @@ $ sudo insserv s0vz ( register new service )
 
 $ sudo vim /etc/s0vz.cfg ( edit your config )
 
-$ /etc/init.d/s0vz start ( start the service as user, dont be root! )
+Reboot and check '/var/log/syslog' for outputs! 
 
-Check '/var/log/syslog' for outputs!  
+
 
 
