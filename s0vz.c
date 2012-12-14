@@ -231,6 +231,9 @@ return ( EXIT_SUCCESS );
 
 
 int http_post(vzuuid) {
+
+		// siehe int ds2482_sysfs_init(void)
+
         char format[] = "http://%s:%d/%s/data/%s.json";
         char url[sizeof format+128];
 
