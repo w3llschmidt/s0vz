@@ -1,6 +1,6 @@
-s0vz - S0/Impulse to Volkszaehler 'RaspberryPI daemon'
-======================================================
-Version 0.2 (Beta)
+S0/Impulse to Volkszaehler 'RaspberryPI daemon'
+===============================================
+S0VZ Version 0.2 (Beta)
 
 Hardware by Udo S.  
 http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung
