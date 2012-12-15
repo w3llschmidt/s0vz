@@ -8,7 +8,9 @@ http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung
 ![My image](http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_6xs0_3x1-wire_1xir_bestueckt.png?w=300)
 
 Backend-Software  
-https://github.com/volkszaehler/volkszaehler.org.git  
+https://github.com/volkszaehler/volkszaehler.org.git
+
+![My image](http://wiki.volkszaehler.org/_media/software/releases/demo-screenshot.jpg?w=300)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
