@@ -1,3 +1,6 @@
+
+--- insert bevor 'exit 0' --- remove this line ---
+
 # S0/Impulse to Volkszaehler 'RaspberryPI deamon'
 # We activate and configure the GPIO Pins here ->
 
