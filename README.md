@@ -5,7 +5,7 @@ S0VZ Version 0.2 (Beta)
 Hardware by Udo S.  
 http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung
 
-![My image](http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_6xs0_3x1-wire_1xir_bestueckt.png?w=600)  
+![My image](http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_6xs0_3x1-wire_1xir_bestueckt.png?w=300)  
 
 Backend-Software  
 https://github.com/volkszaehler/volkszaehler.org.git
