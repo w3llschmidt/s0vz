@@ -4,12 +4,19 @@ S0/Impulse to Volkszaehler 'RaspberryPI deamon'.
 
 Version 0.5
 
-sudo gcc -o /usr/sbin/s0vz /tmp/s0vz.c -lconfig -lcurl´
+sudo gcc -o /usr/sbin/s0vz /tmp/s0vz.c -lconfig -lcurlï¿½
 
 https://github.com/w3llschmidt/s0vz.git
 https://github.com/volkszaehler/volkszaehler.org.git
 
 Henrik Wellschmidt  <w3llschmidt@gmail.com>
+
+**************************************************************************/
+
+#define DAEMON_NAME "s0vz"
+#define DAEMON_VERSION "0.2"
+
+/**************************************************************************
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -39,9 +46,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <sys/ioctl.h>
 #include <curl/curl.h>
 #include <poll.h>
-
-#define DAEMON_NAME "s0vz"
-#define DAEMON_VERSION "0.2"
 
 #define BUF_LEN 32
 
