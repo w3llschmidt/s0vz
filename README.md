@@ -30,9 +30,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Installation
 ============
 
-Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) + libcurl4-gnutls-dev + libconfig-dev
+Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) 
 
-firmware update!  -> https://github.com/Hexxeh/rpi-update
+---
+
+curl & libconfig	-> 'sudo apt-get install libcurl4-gnutls-dev libconfig-dev'
+
+The curl & libconfig is only needed if you compile the source! If you use the binary you dont need them!
+
+---
+
+firmware update!	-> https://github.com/Hexxeh/rpi-update
+
+---
 
 s0vz.c 	 	-> /tmp ( sudo gcc -o /usr/sbin/s0vz /tmp/s0vz.c -lconfig -lcurl )
 
