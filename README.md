@@ -1,7 +1,8 @@
 S0/Impulse to Volkszaehler daemon.
 ==================================
 
-This is a Linux SYSFS daemon. Written in ANSI C, provides low memory signature and minimal CPU load.
+This is a Linux SYSFS daemon. Written in ANSI C, provides low memory signature and minimal CPU load.  
+Its fully interrupt driven with no cpu eating idle loops!
 
 Hardware by Udo S.  
 http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung
