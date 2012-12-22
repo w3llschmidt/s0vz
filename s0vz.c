@@ -2,7 +2,7 @@
 
 S0/Impulse to Volkszaehler 'RaspberryPI deamon'.
 
-Version 0.2
+Version 0.5
 
 sudo gcc -o /usr/sbin/s0vz /tmp/s0vz.c -lconfig -lcurl´
 
@@ -75,12 +75,10 @@ void signal_handler(int sig) {
 	}
 }
 
-
 void daemonShutdown() {
 		close(pidFilehandle);
 		remove("/tmp/1wirevz.pid");
 }
-
 
 void daemonize(char *rundir, char *pidfile) {
 	int pid, sid, i;
@@ -169,7 +167,6 @@ void daemonize(char *rundir, char *pidfile) {
 	write(pidFilehandle, str, strlen(str));
 }
 
-
 int cfile(void) {
 	config_t cfg;
 	config_setting_t *setting;
@@ -218,6 +215,7 @@ int cfile(void) {
 	else
 	syslog(LOG_INFO, "VzPath:%s", vzpath);
 
+	//überarbeiten!
 	for (i=0; i<inputs; i++)
 	{
 		char gpio[BUF_LEN];
@@ -229,10 +227,7 @@ int cfile(void) {
 return ( EXIT_SUCCESS );
 }
 
-
 int http_post(vzuuid) {
-
-		// siehe int ds2482_sysfs_init(void)
 
         char format[] = "http://%s:%d/%s/data/%s.json";
         char url[sizeof format+128];
@@ -271,7 +266,6 @@ int http_post(vzuuid) {
 
 		return ( EXIT_SUCCESS );
 }
-
 
 int main(void) {
 
