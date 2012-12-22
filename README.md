@@ -1,6 +1,7 @@
-S0/Impulse to Volkszaehler 'RaspberryPI daemon'
-===============================================
-S0VZ Version 0.2 (Beta)
+S0/Impulse to Volkszaehler daemon.
+==================================
+
+This is a Linux SYSFS daemon. Written in ANSI C, provides low memory signature and minimal CPU load.
 
 Hardware by Udo S.  
 http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung
@@ -8,7 +9,7 @@ http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung
 ![My image](http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_6xs0_3x1-wire_1xir_bestueckt.png?w=200)  
 
 Backend-Software  
-https://github.com/volkszaehler/volkszaehler.org.git
+http://volkszaehler.org/
 
 ![My image](http://wiki.volkszaehler.org/_media/software/releases/demo-screenshot.jpg?w=300)
 
