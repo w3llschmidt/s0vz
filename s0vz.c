@@ -2,9 +2,7 @@
 
 S0/Impulse to Volkszaehler 'RaspberryPI deamon'.
 
-Version 0.5
-
-sudo gcc -o /usr/sbin/s0vz /tmp/s0vz.c -lconfig -lcurl�
+sudo gcc -o /usr/sbin/s0vz s0vz.c -lconfig -lcurl
 
 https://github.com/w3llschmidt/s0vz.git
 https://github.com/volkszaehler/volkszaehler.org.git
@@ -14,7 +12,7 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 **************************************************************************/
 
 #define DAEMON_NAME "s0vz"
-#define DAEMON_VERSION "0.2"
+#define DAEMON_VERSION "1.0"
 
 /**************************************************************************
 
@@ -95,7 +93,6 @@ void daemonize(char *rundir, char *pidfile) {
 		return;
 	}
 
-	/* Signal mask - block */
 	sigemptyset(&newSigSet);
 	sigaddset(&newSigSet, SIGCHLD);
 	sigaddset(&newSigSet, SIGTSTP);
@@ -103,17 +100,14 @@ void daemonize(char *rundir, char *pidfile) {
 	sigaddset(&newSigSet, SIGTTIN);
 	sigprocmask(SIG_BLOCK, &newSigSet, NULL);
 
-	/* Signal handler */
 	newSigAction.sa_handler = signal_handler;
 	sigemptyset(&newSigAction.sa_mask);
 	newSigAction.sa_flags = 0;
 
-	/* Signals to handle */
 	sigaction(SIGHUP, &newSigAction, NULL);
 	sigaction(SIGTERM, &newSigAction, NULL);
 	sigaction(SIGINT, &newSigAction, NULL);
 
-	/* Fork*/
 	pid = fork();
 
 	if (pid < 0)
@@ -127,7 +121,7 @@ void daemonize(char *rundir, char *pidfile) {
 		exit(EXIT_SUCCESS);
 	}
 	
-	umask(027); /* file permissions 750 */
+	umask(027);
 
 	sid = setsid();
 	if (sid < 0)
@@ -140,14 +134,12 @@ void daemonize(char *rundir, char *pidfile) {
 		close(i);
 	}
 
-	/* Route I/O connections */
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
 
-	chdir(rundir); /* change running directory */
+	chdir(rundir);
 
-	/* Ensure only one copy */
 	pidFilehandle = open(pidfile, O_RDWR|O_CREAT, 0600);
 
 	if (pidFilehandle == -1 )
@@ -156,18 +148,14 @@ void daemonize(char *rundir, char *pidfile) {
 		exit(EXIT_FAILURE);
 	}
 
-	/* Try to lock file */
 	if (lockf(pidFilehandle,F_TLOCK,0) == -1)
 	{
-		/* Couldn't get lock on lock file */
 		syslog(LOG_INFO, "Could not lock PID lock file %s, exiting", pidfile);
 		exit(EXIT_FAILURE);
 	}
 
-	/* Get and format PID */
 	sprintf(str,"%d\n",getpid());
 
-	/* write pid to lockfile */
 	write(pidFilehandle, str, strlen(str));
 }
 
@@ -273,24 +261,18 @@ int http_post(vzuuid) {
 
 int main(void) {
 
-	// Dont talk, just kiss!
 	fclose(stdout);
 	fclose(stderr);
 
-	// Start Logging
 	setlogmask(LOG_UPTO(LOG_INFO));
 	openlog(DAEMON_NAME, LOG_CONS | LOG_PERROR, LOG_USER);
 
-	// Im awaken!
 	syslog(LOG_INFO, "S0/Impulse to Volkszaehler RaspberryPI deamon %s", DAEMON_VERSION);
 
-	// Check and process the config file (/etci/s0vz.cfg) */
 	cfile();
 
-	// Deamonize
 	daemonize("/tmp/", "/tmp/s0vz.pid");
 
-		// S0 starts here!
 		char buffer[BUF_LEN];
 		struct pollfd fds[inputs];
 				
