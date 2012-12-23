@@ -1,6 +1,6 @@
 ### BEGIN INIT INFO
 # Provides: s0vz
-# Required-Start: $ALL
+# Required-Start: $all
 # Required-Stop: 
 # Default-Start: 2 3 4 5
 # Default-Stop: 1
