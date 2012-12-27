@@ -44,7 +44,7 @@ firmware update!	-> https://github.com/Hexxeh/rpi-update
 
 ---
 
-s0vz.c 	 	-> /tmp ( sudo gcc -o /usr/sbin/s0vz /tmp/s0vz.c -lconfig -lcurl )
+s0vz.c 	 	-> /tmp ( sudo gcc -o /usr/sbin/s0vz s0vz.c -lconfig -lcurl )
 
 s0vz.cfg	 	-> /etc/  
 
