@@ -55,7 +55,7 @@ s0vz 	 	-> /etc/init.d/ ( start/stop/restart )
 Configuration
 =============
 
-$ $ sudo ln -s /etc/init.d/s0vz /etc/rc2.d/S10s0vz ( autostart, after rc.local! )
+$ sudo ln -s /etc/init.d/s0vz /etc/rc2.d/S10s0vz ( autostart, after rc.local! )
 
 $ sudo vim /etc/s0vz.cfg ( edit your config )
 
