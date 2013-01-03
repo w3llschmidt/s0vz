@@ -207,7 +207,7 @@ int cfile(void) {
 	else
 	syslog(LOG_INFO, "VzPath:%s", vzpath);
 
-	//überarbeiten!
+	//ï¿½berarbeiten!
 	for (i=0; i<inputs; i++)
 	{
 		char gpio[BUF_LEN];
@@ -271,7 +271,9 @@ int main(void) {
 
 	cfile();
 
-	daemonize("/tmp/", "/tmp/s0vz.pid");
+	char pid_file[16];
+	sprintf ( pid_file, "/tmp/%s.pid", DAEMON_NAME );
+	daemonize( "/tmp/", pid_file );
 
 		char buffer[BUF_LEN];
 		struct pollfd fds[inputs];
