@@ -56,7 +56,7 @@ int pidFilehandle, vzport, i;
 
 const char *vzserver, *vzpath, *vzuuid[64];
 
-char gpio_pin_id[] = { 17, 18, 22, 23, 24, 27 }, url[254];
+char gpio_pin_id[] = { 17, 18, 27, 22, 23, 24 }, url[254];
 int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
 
 void signal_handler(int sig) {
