@@ -211,6 +211,10 @@ void cfile() {
 	else
 	syslog(LOG_INFO, "VzPath:%s", vzpath);
 
+<<<<<<< HEAD
+=======
+	//�berarbeiten!
+>>>>>>> 6169f97fc91199771932c6a9155d5cd9cd457c0d
 	for (i=0; i<inputs; i++)
 	{
 		char gpio[6];

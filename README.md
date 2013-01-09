@@ -32,19 +32,13 @@ Installation
 
 Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) 
 
----
+Binding libraries: libcurl & libconfig -> 'sudo apt-get install libcurl4-gnutls-dev libconfig-dev'
 
-curl & libconfig	-> 'sudo apt-get install libcurl4-gnutls-dev libconfig-dev'
-
-The curl & libconfig is only needed if you compile the source! If you use the binary you dont need them!
+Download: 'git clone https://github.com/w3llschmidt/s0vz.git /tmp/s0vz'
 
 ---
 
-firmware update!	-> https://github.com/Hexxeh/rpi-update
-
----
-
-s0vz.c 	 	-> /tmp ( sudo gcc -o /usr/sbin/s0vz /tmp/s0vz.c -lconfig -lcurl )
+s0vz.c 	 	-> sudo gcc -o /usr/sbin/s0vz /tmp/s0vz/s0vz.c -lconfig -lcurl
 
 s0vz.cfg	 	-> /etc/  
 
@@ -55,12 +49,26 @@ s0vz 	 	-> /etc/init.d/ ( start/stop/restart )
 Configuration
 =============
 
-$ sudo insserv s0vz ( register new service )
+$ sudo vim /etc/init.d/rc.local ( replace '$ALL' with '$remote_fs $syslog $network' )
+
+$ sudo insserv s0vz ( make deamon autostart )
 
 $ sudo vim /etc/s0vz.cfg ( edit your config )
 
-Reboot and check '/var/log/syslog' for outputs! 
+Reboot and check '/var/log/syslog' for outputs!
 
+License
+=======
 
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
