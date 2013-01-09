@@ -12,7 +12,8 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 **************************************************************************/
 
 #define DAEMON_NAME "s0vz"
-#define DAEMON_VERSION "1.0"
+#define DAEMON_VERSION "1.1"
+#define DAEMON_BUILD "0064"
 
 /**************************************************************************
 
@@ -53,9 +54,9 @@ void daemonize(char *rundir, char *pidfile);
 
 int pidFilehandle, vzport, i;
 
-const char *vzserver, *vzpath, *vzuuid[6];
+const char *vzserver, *vzpath, *vzuuid[64];
 
-char gpio_pin_id[] = { 17, 18, 21, 22, 23, 24 };
+char gpio_pin_id[] = { 17, 18, 22, 23, 24, 27 }, url[254];
 int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
 
 void signal_handler(int sig) {
@@ -121,7 +122,7 @@ void daemonize(char *rundir, char *pidfile) {
 		exit(EXIT_SUCCESS);
 	}
 	
-	umask(027);
+	//umask(027);
 
 	sid = setsid();
 	if (sid < 0)
@@ -159,9 +160,12 @@ void daemonize(char *rundir, char *pidfile) {
 	write(pidFilehandle, str, strlen(str));
 }
 
-int cfile(void) {
+void cfile() {
+
 	config_t cfg;
-	config_setting_t *setting;
+
+	//config_setting_t *setting;
+
 	config_init(&cfg);
 
 	int chdir(const char *path);
@@ -207,72 +211,77 @@ int cfile(void) {
 	else
 	syslog(LOG_INFO, "VzPath:%s", vzpath);
 
-	//überarbeiten!
 	for (i=0; i<inputs; i++)
 	{
-		char gpio[BUF_LEN];
+		char gpio[6];
 		sprintf ( gpio, "GPIO%01d", i );
 		if ( config_lookup_string( &cfg, gpio, &vzuuid[i]) == CONFIG_TRUE )
 		syslog ( LOG_INFO, "%s = %s", gpio, vzuuid[i] );
 	}
 
-return ( EXIT_SUCCESS );
 }
 
-int http_post(vzuuid) {
+void http_post(const char *vzuuid) {
 
-        char format[] = "http://%s:%d/%s/data/%s.json";
-        char url[sizeof format+128];
+	sprintf(url, "http://%s:%d/%s/data/%s.json", vzserver, vzport, vzpath, vzuuid);
+	
+	syslog(LOG_INFO, "%s", url);
+		
+	CURL *curl;
+	CURLcode curl_res;
+	
+	curl_global_init(CURL_GLOBAL_ALL);
 
-        sprintf ( url, format, vzserver, vzport, vzpath, vzuuid );
+	curl = curl_easy_init();
 
-		CURL *curl;
-		CURLcode res;
+	if(curl) 
+	{
+	
+		FILE* devnull = NULL;
+		devnull = fopen("/dev/null", "w+");
 
-		curl_global_init(CURL_GLOBAL_ALL);
+		curl_easy_setopt(curl, CURLOPT_USERAGENT, DAEMON_NAME " " DAEMON_VERSION ); 
+		curl_easy_setopt(curl, CURLOPT_URL, url);
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
 
-		curl = curl_easy_init();
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, devnull);
+	
+			if( (curl_res = curl_easy_perform(curl)) != CURLE_OK) {
+			syslog(LOG_INFO, "HTTP_POST(): %s", curl_easy_strerror(curl_res) );
+			}
+	
+		curl_easy_cleanup(curl);
+		fclose ( devnull );
+		
+	}
 
-		if(curl) 
-		{
-			FILE* devnull = NULL;
-			devnull = fopen("/dev/null", "w+");
-
-			curl_easy_setopt(curl, CURLOPT_USERAGENT, DAEMON_NAME " " DAEMON_VERSION ); 
-			curl_easy_setopt(curl, CURLOPT_URL, url);
-			curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
-
-			curl_easy_setopt(curl, CURLOPT_WRITEDATA, devnull);
-
-			res = curl_easy_perform(curl);
-
-				if(res != CURLE_OK)
-				syslog(LOG_INFO, "http_post() %s", curl_easy_strerror(res)); 
-
-			curl_easy_cleanup(curl);
-
-			fclose(devnull);
-		}
-
-		curl_global_cleanup();
-
-		return ( EXIT_SUCCESS );
+curl_global_cleanup();
 }
 
-int main(void) {
+int main() {
 
-	fclose(stdout);
-	fclose(stderr);
+	freopen( "/dev/null", "r", stdin);
+	freopen( "/dev/null", "w", stdout);
+	freopen( "/dev/null", "w", stderr);
 
 	setlogmask(LOG_UPTO(LOG_INFO));
 	openlog(DAEMON_NAME, LOG_CONS | LOG_PERROR, LOG_USER);
 
-	syslog(LOG_INFO, "S0/Impulse to Volkszaehler RaspberryPI deamon %s", DAEMON_VERSION);
+	syslog ( LOG_INFO, "S0/Impulse to Volkszaehler RaspberryPI deamon %s (%s)", DAEMON_VERSION, DAEMON_BUILD );
 
 	cfile();
 
-	daemonize("/tmp/", "/tmp/s0vz.pid");
+	char pid_file[16];
+	sprintf ( pid_file, "/tmp/%s.pid", DAEMON_NAME );
+	daemonize( "/tmp/", pid_file );
 
+	syslog(LOG_INFO, "%s", vzuuid[0]);
+	syslog(LOG_INFO, "%s", vzuuid[1]);
+	syslog(LOG_INFO, "%s", vzuuid[2]);
+	syslog(LOG_INFO, "%s", vzuuid[3]);
+	syslog(LOG_INFO, "%s", vzuuid[4]);
+	syslog(LOG_INFO, "%s", vzuuid[5]);	
+		
 		char buffer[BUF_LEN];
 		struct pollfd fds[inputs];
 				
@@ -304,9 +313,8 @@ int main(void) {
 				{
 					if (fds[i].revents & POLLPRI)
 					{
-						int in = read(fds[i].fd, buffer, BUF_LEN);
+						read(fds[i].fd, buffer, BUF_LEN);
 						http_post(vzuuid[i]);
-						
 					}
 				}
 			}
