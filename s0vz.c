@@ -32,19 +32,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************************/
 
-#include <stdio.h>
-#include <signal.h>
-#include <syslog.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <libconfig.h>
-#include <stddef.h>
-#include <sys/ioctl.h>
-#include <curl/curl.h>
-#include <poll.h>
+#include <stdio.h>              /* standard library functions for file input and output */
+#include <stdlib.h>             /* standard library for the C programming language, */
+#include <string.h>             /* functions implementing operations on strings  */
+#include <unistd.h>             /* provides access to the POSIX operating system API */
+#include <sys/stat.h>           /* declares the stat() functions; umask */
+#include <fcntl.h>              /* file descriptors */
+#include <syslog.h>             /* send messages to the system logger */
+#include <errno.h>              /* macros to report error conditions through error codes */
+#include <signal.h>             /* signal processing */
+#include <stddef.h>             /* defines the macros NULL and offsetof as well as the types ptrdiff_t, wchar_t, and size_t */
+
+#include <libconfig.h>          /* reading, manipulating, and writing structured configuration files */
+#include <curl/curl.h>          /* multiprotocol file transfer library */
+#include <poll.h>		/* wait for events on file descriptors */
+
+#include <sys/ioctl.h>		/* */
 
 #define BUF_LEN 32
 
