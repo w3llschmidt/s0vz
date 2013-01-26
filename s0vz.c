@@ -227,8 +227,6 @@ void cfile() {
 void http_post(const char *vzuuid) {
 
 	sprintf(url, "http://%s:%d/%s/data/%s.json", vzserver, vzport, vzpath, vzuuid);
-	
-	syslog(LOG_INFO, "%s", url);
 		
 	CURL *curl;
 	CURLcode curl_res;
@@ -277,13 +275,6 @@ int main() {
 	char pid_file[16];
 	sprintf ( pid_file, "/tmp/%s.pid", DAEMON_NAME );
 	daemonize( "/tmp/", pid_file );
-
-	syslog(LOG_INFO, "%s", vzuuid[0]);
-	syslog(LOG_INFO, "%s", vzuuid[1]);
-	syslog(LOG_INFO, "%s", vzuuid[2]);
-	syslog(LOG_INFO, "%s", vzuuid[3]);
-	syslog(LOG_INFO, "%s", vzuuid[4]);
-	syslog(LOG_INFO, "%s", vzuuid[5]);	
 		
 		char buffer[BUF_LEN];
 		struct pollfd fds[inputs];
