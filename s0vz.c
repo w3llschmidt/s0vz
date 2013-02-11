@@ -62,6 +62,8 @@ const char *vzserver, *vzpath, *vzuuid[64];
 char gpio_pin_id[] = { 17, 18, 27, 22, 23, 24 }, url[254];
 int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
 
+struct timeval tv;
+
 void signal_handler(int sig) {
 
 	switch(sig)
@@ -226,7 +228,10 @@ void cfile() {
 
 void http_post(const char *vzuuid) {
 
-	sprintf(url, "http://%s:%d/%s/data/%s.json", vzserver, vzport, vzpath, vzuuid);
+	gettimeofday(&tv,NULL);
+	unsigned long long ms_timestamp = (unsigned long long)(tv.tv_sec) * 1000 + (unsigned long long)(tv.tv_usec) / 1000;
+
+	sprintf(url, "http://%s:%d/%s/data/%s.json?ts=%llu", vzserver, vzport, vzpath, vzuuid, ms_timestamp);
 		
 	CURL *curl;
 	CURLcode curl_res;
