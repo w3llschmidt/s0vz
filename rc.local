@@ -1,4 +1,4 @@
---- insert bevor 'exit 0' --- remove this line ---
+--- insert before 'exit 0' --- remove this line ---
 
 # Part of S0/Impulse to Volkszaehler 'RaspberryPI deamon'
 echo 17 > /sys/class/gpio/export && echo "in" > /sys/class/gpio/gpio17/direction && echo "falling" > /sys/class/gpio/gpio17/edge
