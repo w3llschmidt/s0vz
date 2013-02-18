@@ -49,7 +49,7 @@ s0vz 	 	-> /etc/init.d/ ( start/stop/restart )
 Configuration
 =============
 
-$ sudo vim /etc/init.d/rc.local ( replace '$ALL' with '$remote_fs $syslog $network' )
+$ sudo vim /etc/init.d/rc.local ( replace '$all' with '$remote_fs $syslog $network' )
 
 $ sudo insserv s0vz ( make deamon autostart )
 
