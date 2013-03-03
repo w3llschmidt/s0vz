@@ -9,7 +9,7 @@
 
 #!/bin/bash
 
-DAEMON="/usr/local/bin/s0vz"
+DAEMON="/usr/local/sbin/s0vz"
 PIDFILE="/tmp/s0vz.pid" 
 
 test -f $DAEMON || exit 0
