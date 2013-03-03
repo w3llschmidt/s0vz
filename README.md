@@ -38,7 +38,7 @@ Download: 'git clone https://github.com/w3llschmidt/s0vz.git /tmp/s0vz'
 
 ---
 
-s0vz.c 	 	-> sudo gcc -o /usr/sbin/s0vz /tmp/s0vz/s0vz.c -lconfig -lcurl
+s0vz.c 	 	-> sudo gcc -o /usr/local/bin/s0vz /tmp/s0vz/s0vz.c -lconfig -lcurl
 
 s0vz.cfg	 	-> /etc/  
 
