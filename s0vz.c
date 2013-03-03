@@ -3,7 +3,6 @@
 S0/Impulse to Volkszaehler 'RaspberryPI deamon'.
 
 https://github.com/w3llschmidt/s0vz.git
-https://github.com/volkszaehler/volkszaehler.org.git
 
 Henrik Wellschmidt  <w3llschmidt@gmail.com>
 
