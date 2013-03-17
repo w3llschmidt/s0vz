@@ -12,7 +12,7 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 **************************************************************************/
 
 #define DAEMON_NAME "s0vz"
-#define DAEMON_VERSION "1.2"
+#define DAEMON_VERSION "1.4"
 #define DAEMON_BUILD "1"
 
 /**************************************************************************
@@ -45,17 +45,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <libconfig.h>          /* reading, manipulating, and writing structured configuration files */
 #include <curl/curl.h>          /* multiprotocol file transfer library */
-#include <poll.h>		/* wait for events on file descriptors */
+#include <poll.h>			/* wait for events on file descriptors */
 
 #include <sys/ioctl.h>		/* */
 
-#define BUF_LEN 32
+#define BUF_LEN 64
 
 void daemonShutdown();
 void signal_handler(int sig);
 void daemonize(char *rundir, char *pidfile);
 
-int pidFilehandle, vzport, i;
+int pidFilehandle, vzport, i, len;
 
 const char *vzserver, *vzpath, *vzuuid[64];
 
@@ -127,7 +127,7 @@ void daemonize(char *rundir, char *pidfile) {
 		exit(EXIT_SUCCESS);
 	}
 	
-	//umask(027);
+	umask(027);
 
 	sid = setsid();
 	if (sid < 0)
@@ -226,12 +226,27 @@ void cfile() {
 
 }
 
-void http_post(const char *vzuuid) {
+unsigned long long unixtime() {
 
 	gettimeofday(&tv,NULL);
 	unsigned long long ms_timestamp = (unsigned long long)(tv.tv_sec) * 1000 + (unsigned long long)(tv.tv_usec) / 1000;
 
-	sprintf(url, "http://%s:%d/%s/data/%s.json?ts=%llu", vzserver, vzport, vzpath, vzuuid, ms_timestamp);
+return ms_timestamp;
+}
+
+void logfile(const char *vzuuid) {
+
+	FILE* logfile = NULL;
+	logfile = fopen("/tmp/s0vz.csv", "a+");
+	
+		fprintf(logfile,"%s;%llu\n", vzuuid, unixtime());
+
+	fclose (logfile);
+}
+
+void http_post(const char *vzuuid) {
+
+	sprintf(url, "http://%s:%d/%s/data/%s.json?ts=%llu", vzserver, vzport, vzpath, vzuuid, unixtime());
 		
 	CURL *curl;
 	CURLcode curl_res;
@@ -242,7 +257,6 @@ void http_post(const char *vzuuid) {
 
 	if(curl) 
 	{
-	
 		FILE* devnull = NULL;
 		devnull = fopen("/dev/null", "w+");
 
@@ -273,47 +287,48 @@ int main() {
 	setlogmask(LOG_UPTO(LOG_INFO));
 	openlog(DAEMON_NAME, LOG_CONS | LOG_PERROR, LOG_USER);
 
-	syslog ( LOG_INFO, "S0/Impulse to Volkszaehler RaspberryPI deamon %s (%s)", DAEMON_VERSION, DAEMON_BUILD );
+	syslog ( LOG_INFO, "S0/Impulse to Volkszaehler RaspberryPI deamon %s (%s) %d", DAEMON_VERSION, DAEMON_BUILD, inputs );
 
 	cfile();
 
 	char pid_file[16];
 	sprintf ( pid_file, "/tmp/%s.pid", DAEMON_NAME );
 	daemonize( "/tmp/", pid_file );
-		
+
 		char buffer[BUF_LEN];
 		struct pollfd fds[inputs];
 				
 			for (i=0; i<inputs; i++) 
 			{
-				char buffer[BUF_LEN];
 				snprintf ( buffer, BUF_LEN, "/sys/class/gpio/gpio%d/value", gpio_pin_id[i] );
-				if((fds[i].fd = open( buffer, O_RDONLY )) ==-1)
+				if((fds[i].fd = open(buffer, O_RDONLY|O_NONBLOCK)) == 0)
 				{
 					syslog(LOG_INFO,"Error:%s (%m)", buffer);
+					exit(1);
 				}
 			}
 		
 			for (i=0; i<inputs; i++) 
 			{
 				fds[i].events = POLLPRI;
+				fds[i].revents = 0;								
+
 			}
-				
-			while(1) 
+							
+			for ( ;; )
 			{
-				int ret = poll(fds, inputs, -1 );
+				int ret = poll(fds, inputs, 1000);
 						
-					if(ret<0) 
-					{
-						syslog(LOG_INFO,"Error: poll(fds, inputs, -1 )");
-					}
-				
-				for (i=0; i<inputs; i++) 
+				if(ret>0)
 				{
-					if (fds[i].revents & POLLPRI)
+					for (i=0; i<inputs; i++) 
 					{
-						read(fds[i].fd, buffer, BUF_LEN);
+						if (fds[i].revents & POLLPRI)
+						{
+						len = read(fds[i].fd, buffer, BUF_LEN);
 						http_post(vzuuid[i]);
+						logfile(vzuuid[i]);
+						}
 					}
 				}
 			}
