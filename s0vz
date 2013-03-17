@@ -9,7 +9,7 @@
 
 #!/bin/bash
 
-DAEMON="/usr/sbin/s0vz"
+DAEMON="/usr/local/sbin/s0vz"
 PIDFILE="/tmp/s0vz.pid" 
 
 test -f $DAEMON || exit 0
@@ -18,7 +18,7 @@ case "$1" in
 
 	start)
 		test ! -f $PIDFILE || { echo "Deamon already running!"; exit 0; }
-		su -c $DAEMON pi
+		chrt -r 99 su -c $DAEMON pi
 		;;
 
 	stop)

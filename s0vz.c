@@ -2,10 +2,7 @@
 
 S0/Impulse to Volkszaehler 'RaspberryPI deamon'.
 
-sudo gcc -o /usr/sbin/s0vz s0vz.c -lconfig -lcurl
-
 https://github.com/w3llschmidt/s0vz.git
-https://github.com/volkszaehler/volkszaehler.org.git
 
 Henrik Wellschmidt  <w3llschmidt@gmail.com>
 

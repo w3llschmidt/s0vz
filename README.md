@@ -34,11 +34,11 @@ Precondition: Raspian Linux (http://www.raspberrypi.org/downloads)
 
 Binding libraries: libcurl & libconfig -> 'sudo apt-get install libcurl4-gnutls-dev libconfig-dev'
 
-Download: 'git clone https://github.com/w3llschmidt/s0vz.git /tmp/s0vz'
+Download: 'git clone https://github.com/w3llschmidt/s0vz.git /usr/local/src/s0vz'
 
 ---
 
-s0vz.c 	 	-> sudo gcc -o /usr/sbin/s0vz /tmp/s0vz/s0vz.c -lconfig -lcurl
+s0vz.c 	 	-> 'sudo gcc -o /usr/local/sbin/s0vz /usr/local/src/s0vz/s0vz.c -lconfig -lcurl'
 
 s0vz.cfg	 	-> /etc/  
 
