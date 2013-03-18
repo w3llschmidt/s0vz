@@ -231,16 +231,6 @@ unsigned long long unixtime() {
 return ms_timestamp;
 }
 
-void logfile(const char *vzuuid) {
-
-	FILE* logfile = NULL;
-	logfile = fopen("/tmp/s0vz.csv", "a+");
-	
-		fprintf(logfile,"%s;%llu\n", vzuuid, unixtime());
-
-	fclose (logfile);
-}
-
 void http_post(const char *vzuuid) {
 
 	sprintf(url, "http://%s:%d/%s/data/%s.json?ts=%llu", vzserver, vzport, vzpath, vzuuid, unixtime());
@@ -324,7 +314,6 @@ int main() {
 						{
 						len = read(fds[i].fd, buffer, BUF_LEN);
 						http_post(vzuuid[i]);
-						logfile(vzuuid[i]);
 						}
 					}
 				}
