@@ -19,6 +19,7 @@ case "$1" in
 	start)
 		test ! -f $PIDFILE || { echo "Deamon already running!"; exit 0; }
 		chrt -r 99 su -c $DAEMON pi
+		su -c "renice -99 `pidof $DAEMON`" >/dev/null 2>&1
 		;;
 
 	stop)
