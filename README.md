@@ -1,4 +1,4 @@
-S0/Impulse to Volkszaehler daemon.
+S0/Impulse to Volkszaehler daemon. FORK
 ==================================
 
 This is a Linux SYSFS daemon. Written in ANSI C, provides low memory signature and minimal CPU load.  
