@@ -23,8 +23,8 @@ case "$1" in
 		;;
 
 	stop)
-		killall -q s0vz
-		rm -f /tmp/s0vz.pid
+		killall -q $DAEMON
+		rm -f $PIDFILE
 		;;
 
 	restart)
