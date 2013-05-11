@@ -59,6 +59,8 @@ const char *vzserver, *vzpath, *vzuuid[64];
 char gpio_pin_id[] = { 17, 18, 27, 22, 23, 24 }, url[254];
 int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
 
+unsigned long long last_time, current_time;
+
 struct timeval tv;
 
 void signal_handler(int sig) {
@@ -232,8 +234,12 @@ return ms_timestamp;
 }
 
 void http_post(const char *vzuuid) {
+	
+	current_time = unixtime();
 
-	sprintf(url, "http://%s:%d/%s/data/%s.json?ts=%llu", vzserver, vzport, vzpath, vzuuid, unixtime());
+	if (current_time > last_time + 10000)
+	{
+	sprintf(url, "http://%s:%d/%s/data/%s.json?ts=%llu", vzserver, vzport, vzpath, vzuuid, current_time);
 		
 	CURL *curl;
 	CURLcode curl_res;
@@ -262,7 +268,9 @@ void http_post(const char *vzuuid) {
 		
 	}
 
-curl_global_cleanup();
+	curl_global_cleanup();
+	last_time = current_time;
+	}
 }
 
 int main() {
