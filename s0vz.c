@@ -10,7 +10,7 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 
 #define DAEMON_NAME "s0vz"
 #define DAEMON_VERSION "1.4"
-#define DAEMON_BUILD "1"
+#define DAEMON_BUILD "4"
 
 /**************************************************************************
 
@@ -52,14 +52,21 @@ void daemonShutdown();
 void signal_handler(int sig);
 void daemonize(char *rundir, char *pidfile);
 
-int pidFilehandle, vzport, i, len;
+int pidFilehandle, vzport, i, len, running_handles, rc;
 
 const char *vzserver, *vzpath, *vzuuid[64];
 
-char gpio_pin_id[] = { 17, 18, 27, 22, 23, 24 }, url[254];
+char gpio_pin_id[] = { 17, 18, 27, 22, 23, 24 }, url[128];
+
 int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
 
 struct timeval tv;
+
+CURL *easyhandle[sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0])];
+CURLM *multihandle;
+CURLMcode multihandle_res;
+
+static char errorBuffer[CURL_ERROR_SIZE+1];
 
 void signal_handler(int sig) {
 
@@ -82,7 +89,7 @@ void signal_handler(int sig) {
 
 void daemonShutdown() {
 		close(pidFilehandle);
-		remove("/tmp/1wirevz.pid");
+		remove("/tmp/s0vz.pid");
 }
 
 void daemonize(char *rundir, char *pidfile) {
@@ -231,91 +238,91 @@ unsigned long long unixtime() {
 return ms_timestamp;
 }
 
-void http_post(const char *vzuuid) {
+void update_curl_handle(const char *vzuuid) {
 
-	sprintf(url, "http://%s:%d/%s/data/%s.json?ts=%llu", vzserver, vzport, vzpath, vzuuid, unixtime());
+		curl_multi_remove_handle(multihandle, easyhandle[i]);
 		
-	CURL *curl;
-	CURLcode curl_res;
-	
-	curl_global_init(CURL_GLOBAL_ALL);
-
-	curl = curl_easy_init();
-
-	if(curl) 
-	{
-		FILE* devnull = NULL;
-		devnull = fopen("/dev/null", "w+");
-
-		curl_easy_setopt(curl, CURLOPT_USERAGENT, DAEMON_NAME " " DAEMON_VERSION ); 
-		curl_easy_setopt(curl, CURLOPT_URL, url);
-		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
-
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, devnull);
-	
-			if( (curl_res = curl_easy_perform(curl)) != CURLE_OK) {
-			syslog(LOG_INFO, "HTTP_POST(): %s", curl_easy_strerror(curl_res) );
-			}
-	
-		curl_easy_cleanup(curl);
-		fclose ( devnull );
+		sprintf(url, "http://%s:%d/%s/data/%s.json?ts=%llu", vzserver, vzport, vzpath, vzuuid, unixtime());
 		
-	}
-
-curl_global_cleanup();
+		curl_easy_setopt(easyhandle[i], CURLOPT_URL, url);
+		
+		curl_multi_add_handle(multihandle, easyhandle[i]);
+				
 }
 
-int main() {
+int main(void) {
 
 	freopen( "/dev/null", "r", stdin);
 	freopen( "/dev/null", "w", stdout);
 	freopen( "/dev/null", "w", stderr);
 
+	FILE* devnull = NULL;		
+	devnull = fopen("/dev/null", "w+");
+		
 	setlogmask(LOG_UPTO(LOG_INFO));
 	openlog(DAEMON_NAME, LOG_CONS | LOG_PERROR, LOG_USER);
 
-	syslog ( LOG_INFO, "S0/Impulse to Volkszaehler RaspberryPI deamon %s (%s) %d", DAEMON_VERSION, DAEMON_BUILD, inputs );
-
+	syslog ( LOG_INFO, "S0/Impulse to Volkszaehler RaspberryPI deamon %s.%s", DAEMON_VERSION, DAEMON_BUILD );
+	
 	cfile();
-
+	
 	char pid_file[16];
 	sprintf ( pid_file, "/tmp/%s.pid", DAEMON_NAME );
 	daemonize( "/tmp/", pid_file );
-
+	
 		char buffer[BUF_LEN];
 		struct pollfd fds[inputs];
+		
+		curl_global_init(CURL_GLOBAL_ALL);
+		multihandle = curl_multi_init();
+			
+		for (i=0; i<inputs; i++) {
+		
+			snprintf ( buffer, BUF_LEN, "/sys/class/gpio/gpio%d/value", gpio_pin_id[i] );
+
+			if((fds[i].fd = open(buffer, O_RDONLY|O_NONBLOCK)) == 0) {
+			
+				syslog(LOG_INFO,"Error:%s (%m)", buffer);
+				exit(1);
 				
-			for (i=0; i<inputs; i++) 
-			{
-				snprintf ( buffer, BUF_LEN, "/sys/class/gpio/gpio%d/value", gpio_pin_id[i] );
-				if((fds[i].fd = open(buffer, O_RDONLY|O_NONBLOCK)) == 0)
-				{
-					syslog(LOG_INFO,"Error:%s (%m)", buffer);
-					exit(1);
-				}
 			}
 		
-			for (i=0; i<inputs; i++) 
-			{
-				fds[i].events = POLLPRI;
-				fds[i].revents = 0;								
-
-			}
-							
-			for ( ;; )
-			{
+			fds[i].events = POLLPRI;
+			fds[i].revents = 0;	
+				
+			easyhandle[i] = curl_easy_init();
+			
+			curl_easy_setopt(easyhandle[i], CURLOPT_URL, url);
+			curl_easy_setopt(easyhandle[i], CURLOPT_POSTFIELDS, "");
+			curl_easy_setopt(easyhandle[i], CURLOPT_USERAGENT, DAEMON_NAME " " DAEMON_VERSION );
+			curl_easy_setopt(easyhandle[i], CURLOPT_WRITEDATA, devnull);
+			curl_easy_setopt(easyhandle[i], CURLOPT_ERRORBUFFER, errorBuffer);
+			
+			curl_multi_add_handle(multihandle, easyhandle[i]);
+										
+		}
+										
+			for ( ;; ) {
+			
+				if((multihandle_res = curl_multi_perform(multihandle, &running_handles)) != CURLM_OK) {
+				syslog(LOG_INFO, "HTTP_POST(): %s", curl_multi_strerror(multihandle_res) );
+				}
+				
 				int ret = poll(fds, inputs, 1000);
 						
-				if(ret>0)
-				{
-					for (i=0; i<inputs; i++) 
-					{
-						if (fds[i].revents & POLLPRI)
-						{
+				if(ret>0) {
+			
+					for (i=0; i<inputs; i++) {
+						if (fds[i].revents & POLLPRI) {
 						len = read(fds[i].fd, buffer, BUF_LEN);
-						http_post(vzuuid[i]);
+						update_curl_handle(vzuuid[i]);
 						}
 					}
 				}
 			}
+	
+		curl_global_cleanup();
+	
+return 0;
 }
+
