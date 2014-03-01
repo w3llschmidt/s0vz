@@ -56,7 +56,7 @@ int pidFilehandle, vzport, i, len, running_handles, rc;
 
 const char *vzserver, *vzpath, *vzuuid[64];
 
-char gpio_pin_id[] = { 17, 18, 27, 22, 23, 24 }, url[128];
+char gpio_pin_id[] = { 17, 18, 23, 22, 24, 10 }, url[128];
 
 int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
 
