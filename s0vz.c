@@ -314,7 +314,7 @@ int main(void) {
 			
 					for (i=0; i<inputs; i++) {
 						if (fds[i].revents & POLLPRI) {
-						len = read(fds[i].fd, buffer, BUF_LEN);
+						len = pread(fds[i].fd, buffer, BUF_LEN, 0);
 						update_curl_handle(vzuuid[i]);
 						}
 					}
