@@ -56,7 +56,9 @@ int pidFilehandle, vzport, i, len, running_handles, rc;
 
 const char *vzserver, *vzpath, *vzuuid[64];
 
-char gpio_pin_id[] = { 17, 18, 27, 22, 23, 24 }, url[128];
+/* char gpio_pin_id[] = { 17, 18, 23,  22, 24,  10 }, url[128]; *//* Raspi GPIO Pins        */
+char    gpio_pin_id[] = { 73, 72, 194, 70, 195, 56 }, url[128];   /* Hummingboard GPIO Pins */
+        /* for muxing HB GPIO pins, see: http://www.solid-run.com/community/topic1571.html  */
 
 int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
 
@@ -286,6 +288,9 @@ int main(void) {
 				exit(1);
 				
 			}
+
+			lseek(fds[i].fd, 0, SEEK_SET);            /* avoids "spike" at deamon startup */
+			len = read(fds[i].fd, buffer, BUF_LEN); 
 		
 			fds[i].events = POLLPRI;
 			fds[i].revents = 0;	
@@ -314,6 +319,7 @@ int main(void) {
 			
 					for (i=0; i<inputs; i++) {
 						if (fds[i].revents & POLLPRI) {
+						lseek(fds[i].fd, 0, SEEK_SET); /* reset file descriptor event */
 						len = read(fds[i].fd, buffer, BUF_LEN);
 						update_curl_handle(vzuuid[i]);
 						}
