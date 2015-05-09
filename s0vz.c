@@ -286,7 +286,7 @@ int main(void) {
 				exit(1);
 				
 			}
-		
+			len = pread(fds[i].fd, buffer, BUF_LEN, 0); /* avoids "spike" at deamon startup */
 			fds[i].events = POLLPRI;
 			fds[i].revents = 0;	
 				
