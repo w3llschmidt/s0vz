@@ -10,7 +10,7 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 
 #define DAEMON_NAME "s0vz"
 #define DAEMON_VERSION "1.4"
-#define DAEMON_BUILD "4"
+#define DAEMON_BUILD "5"
 
 /**************************************************************************
 
@@ -56,7 +56,7 @@ int pidFilehandle, vzport, i, len, running_handles, rc;
 
 const char *vzserver, *vzpath, *vzuuid[64];
 
-char gpio_pin_id[] = { 17, 18, 27, 22, 23, 24 }, url[128];
+char gpio_pin_id[] = { 17, 18, 23, 22, 24, 10 }, url[128];
 
 int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
 
@@ -286,7 +286,7 @@ int main(void) {
 				exit(1);
 				
 			}
-		
+			len = pread(fds[i].fd, buffer, BUF_LEN, 0); /* avoids "spike" at deamon startup */
 			fds[i].events = POLLPRI;
 			fds[i].revents = 0;	
 				
@@ -314,7 +314,7 @@ int main(void) {
 			
 					for (i=0; i<inputs; i++) {
 						if (fds[i].revents & POLLPRI) {
-						len = read(fds[i].fd, buffer, BUF_LEN);
+						len = pread(fds[i].fd, buffer, BUF_LEN, 0);
 						update_curl_handle(vzuuid[i]);
 						}
 					}
