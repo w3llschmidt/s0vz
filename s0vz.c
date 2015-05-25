@@ -10,7 +10,7 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 
 #define DAEMON_NAME "s0vz"
 #define DAEMON_VERSION "1.4"
-#define DAEMON_BUILD "4"
+#define DAEMON_BUILD "5"
 
 /**************************************************************************
 
