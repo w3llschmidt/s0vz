@@ -52,8 +52,7 @@ void daemonShutdown();
 void signal_handler(int sig);
 void daemonize(char *rundir, char *pidfile);
 
-int pidFilehandle, vzport, len, running_handles, rc;
-double aggmin;
+int pidFilehandle, vzport, len, running_handles, rc,  aggmin;
 
 const char *vzserver, *vzpath, *vzuuid[64];
 
@@ -224,13 +223,13 @@ void cfile() {
 	else
 		syslog(LOG_INFO, "VzPath:%s", vzpath);
 
-	if (!config_lookup_float(&cfg, "aggmin", &aggmin))
+	if (!config_lookup_int(&cfg, "aggtime", &aggtime))
 	{
-		aggmin = 0;
-		syslog(LOG_INFO, "Aggretation not active!", aggmin);
+		aggtime = 0;
+		syslog(LOG_INFO, "Aggregation not active!", aggtime);
 	}
 	else
-		syslog(LOG_INFO, "Aggretation:%d minutes", aggmin);
+		syslog(LOG_INFO, "Aggregation:%d seconds", aggtime);
 		
 	for (i=0; i<inputs; i++)
 	{
@@ -318,7 +317,7 @@ int main(void) {
 	}
 	
 	//Initialize time of next upload
-	start_ts = unixtime() + aggmin * 60 * 1000;
+	start_ts = unixtime() + aggtime * 1000;
 				
 	for ( ;; ) {
 	
@@ -326,7 +325,7 @@ int main(void) {
 		//
 		if ((start_ts) < unixtime()) {
 			int value_count = 0;
-			start_ts = unixtime() + aggmin * 60 * 1000;
+			start_ts = unixtime() + aggtime * 1000;
 			
 			syslog ( LOG_DEBUG, "Aggregation interval reached");
 	
