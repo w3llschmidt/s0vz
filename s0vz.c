@@ -52,13 +52,15 @@ void daemonShutdown();
 void signal_handler(int sig);
 void daemonize(char *rundir, char *pidfile);
 
-int pidFilehandle, vzport, i, len, running_handles, rc;
+int pidFilehandle, vzport, len, running_handles, rc,  aggtime;
 
 const char *vzserver, *vzpath, *vzuuid[64];
 
 char gpio_pin_id[] = { 17, 18, 27, 22, 23, 24 }, url[128];
 
 int inputs = sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0]);
+int counter[sizeof(gpio_pin_id)/sizeof(gpio_pin_id[0])];
+unsigned long long start_ts;
 
 struct timeval tv;
 
@@ -154,13 +156,13 @@ void daemonize(char *rundir, char *pidfile) {
 
 	if (pidFilehandle == -1 )
 	{
-		syslog(LOG_INFO, "Could not open PID lock file %s, exiting", pidfile);
+		syslog(LOG_ERR, "Could not open PID lock file %s, exiting", pidfile);
 		exit(EXIT_FAILURE);
 	}
 
 	if (lockf(pidFilehandle,F_TLOCK,0) == -1)
 	{
-		syslog(LOG_INFO, "Could not lock PID lock file %s, exiting", pidfile);
+		syslog(LOG_ERR, "Could not lock PID lock file %s, exiting", pidfile);
 		exit(EXIT_FAILURE);
 	}
 
@@ -172,6 +174,7 @@ void daemonize(char *rundir, char *pidfile) {
 void cfile() {
 
 	config_t cfg;
+	int i;
 
 	//config_setting_t *setting;
 
@@ -183,7 +186,7 @@ void cfile() {
 
 	if(!config_read_file(&cfg, DAEMON_NAME".cfg"))
 	{
-		syslog(LOG_INFO, "Config error > /etc/%s - %s\n", config_error_file(&cfg),config_error_text(&cfg));
+		syslog(LOG_ERR, "Config error > /etc/%s - %s\n", config_error_file(&cfg),config_error_text(&cfg));
 		config_destroy(&cfg);
 		daemonShutdown();
 		exit(EXIT_FAILURE);
@@ -191,66 +194,75 @@ void cfile() {
 
 	if (!config_lookup_string(&cfg, "vzserver", &vzserver))
 	{
-		syslog(LOG_INFO, "Missing 'VzServer' setting in configuration file.");
+		syslog(LOG_ERR, "Missing 'VzServer' setting in configuration file.");
 		config_destroy(&cfg);
 		daemonShutdown();
 		exit(EXIT_FAILURE);
 	}
 	else
-	syslog(LOG_INFO, "VzServer:%s", vzserver);
+		syslog(LOG_INFO, "VzServer:%s", vzserver);
 
 	if (!config_lookup_int(&cfg, "vzport", &vzport))
 	{
-		syslog(LOG_INFO, "Missing 'VzPort' setting in configuration file.");
+		syslog(LOG_ERR, "Missing 'VzPort' setting in configuration file.");
 		config_destroy(&cfg);
 		daemonShutdown();
 		exit(EXIT_FAILURE);
 	}
 	else
-	syslog(LOG_INFO, "VzPort:%d", vzport);
+		syslog(LOG_INFO, "VzPort:%d", vzport);
 
 
 	if (!config_lookup_string(&cfg, "vzpath", &vzpath))
 	{
-		syslog(LOG_INFO, "Missing 'VzPath' setting in configuration file.");
+		syslog(LOG_ERR, "Missing 'VzPath' setting in configuration file.");
 		config_destroy(&cfg);
 		daemonShutdown();
 		exit(EXIT_FAILURE);
 	}
 	else
-	syslog(LOG_INFO, "VzPath:%s", vzpath);
+		syslog(LOG_INFO, "VzPath:%s", vzpath);
 
+	if (!config_lookup_int(&cfg, "aggtime", &aggtime))
+	{
+		aggtime = 0;
+		syslog(LOG_INFO, "Aggregation not active!", aggtime);
+	}
+	else
+		syslog(LOG_INFO, "Aggregation:%d seconds", aggtime);
+		
 	for (i=0; i<inputs; i++)
 	{
 		char gpio[6];
 		sprintf ( gpio, "GPIO%01d", i );
 		if ( config_lookup_string( &cfg, gpio, &vzuuid[i]) == CONFIG_TRUE )
-		syslog ( LOG_INFO, "%s = %s", gpio, vzuuid[i] );
+			syslog ( LOG_INFO, "%s = %s", gpio, vzuuid[i] );
 	}
 
 }
 
 unsigned long long unixtime() {
 
-	gettimeofday(&tv,NULL);
+	gettimeofday(&tv, NULL);
 	unsigned long long ms_timestamp = (unsigned long long)(tv.tv_sec) * 1000 + (unsigned long long)(tv.tv_usec) / 1000;
 
 return ms_timestamp;
 }
 
-void update_curl_handle(const char *vzuuid) {
+void update_curl_handle(const char *vzuuid, int countval, int index) {
 
-		curl_multi_remove_handle(multihandle, easyhandle[i]);
-		
-		sprintf(url, "http://%s:%d/%s/data/%s.json?ts=%llu", vzserver, vzport, vzpath, vzuuid, unixtime());
-		
-		curl_easy_setopt(easyhandle[i], CURLOPT_URL, url);
-		
-		curl_multi_add_handle(multihandle, easyhandle[i]);
-				
+	curl_multi_remove_handle(multihandle, easyhandle[index]);
+	
+	sprintf(url, "http://%s:%d/%s/data/%s.json?ts=%llu&value=%d", vzserver, vzport, vzpath, vzuuid, unixtime(), countval);
+	
+	curl_easy_setopt(easyhandle[index], CURLOPT_URL, url);
+	
+	curl_multi_add_handle(multihandle, easyhandle[index]);
+			
 }
 
 int main(void) {
+	int i;
 
 	freopen( "/dev/null", "r", stdin);
 	freopen( "/dev/null", "w", stdout);
@@ -270,59 +282,96 @@ int main(void) {
 	sprintf ( pid_file, "/tmp/%s.pid", DAEMON_NAME );
 	daemonize( "/tmp/", pid_file );
 	
-		char buffer[BUF_LEN];
-		struct pollfd fds[inputs];
+	char buffer[BUF_LEN];
+	struct pollfd fds[inputs];
+	
+	curl_global_init(CURL_GLOBAL_ALL);
+	multihandle = curl_multi_init();
 		
-		curl_global_init(CURL_GLOBAL_ALL);
-		multihandle = curl_multi_init();
-			
-		for (i=0; i<inputs; i++) {
-		
-			snprintf ( buffer, BUF_LEN, "/sys/class/gpio/gpio%d/value", gpio_pin_id[i] );
+	for (i=0; i<inputs; i++) {
+	
+		snprintf ( buffer, BUF_LEN, "/sys/class/gpio/gpio%d/value", gpio_pin_id[i] );
 
-			if((fds[i].fd = open(buffer, O_RDONLY|O_NONBLOCK)) == 0) {
-			
-				syslog(LOG_INFO,"Error:%s (%m)", buffer);
-				exit(1);
-				
-			}
+		if((fds[i].fd = open(buffer, O_RDONLY|O_NONBLOCK)) == 0) {
 		
-			fds[i].events = POLLPRI;
-			fds[i].revents = 0;	
-				
-			easyhandle[i] = curl_easy_init();
+			syslog(LOG_INFO,"Error:%s (%m)", buffer);
+			exit(1);
 			
-			curl_easy_setopt(easyhandle[i], CURLOPT_URL, url);
-			curl_easy_setopt(easyhandle[i], CURLOPT_POSTFIELDS, "");
-			curl_easy_setopt(easyhandle[i], CURLOPT_USERAGENT, DAEMON_NAME " " DAEMON_VERSION );
-			curl_easy_setopt(easyhandle[i], CURLOPT_WRITEDATA, devnull);
-			curl_easy_setopt(easyhandle[i], CURLOPT_ERRORBUFFER, errorBuffer);
-			
-			curl_multi_add_handle(multihandle, easyhandle[i]);
-										
 		}
-										
-			for ( ;; ) {
+	
+		fds[i].events = POLLPRI;
+		fds[i].revents = 0;	
 			
-				if((multihandle_res = curl_multi_perform(multihandle, &running_handles)) != CURLM_OK) {
-				syslog(LOG_INFO, "HTTP_POST(): %s", curl_multi_strerror(multihandle_res) );
-				}
+		easyhandle[i] = curl_easy_init();
+		
+		curl_easy_setopt(easyhandle[i], CURLOPT_URL, url);
+		curl_easy_setopt(easyhandle[i], CURLOPT_POSTFIELDS, "");
+		curl_easy_setopt(easyhandle[i], CURLOPT_USERAGENT, DAEMON_NAME " " DAEMON_VERSION );
+		curl_easy_setopt(easyhandle[i], CURLOPT_WRITEDATA, devnull);
+		curl_easy_setopt(easyhandle[i], CURLOPT_ERRORBUFFER, errorBuffer);
+		
+		curl_multi_add_handle(multihandle, easyhandle[i]);
+		
+		//Initialize event counter
+		counter[i] = 0;			
+	}
+	
+	//Initialize time of next upload
+	start_ts = unixtime() + aggtime * 1000;
 				
-				int ret = poll(fds, inputs, 1000);
-						
-				if(ret>0) {
+	for ( ;; ) {
+	
+		// At least 5 minutes over?	
+		//
+		if ((start_ts) < unixtime()) {
+			int value_count = 0;
+			start_ts = unixtime() + aggtime * 1000;
 			
-					for (i=0; i<inputs; i++) {
-						if (fds[i].revents & POLLPRI) {
-						len = read(fds[i].fd, buffer, BUF_LEN);
-						update_curl_handle(vzuuid[i]);
-						}
-					}
+			syslog ( LOG_DEBUG, "Aggregation interval reached");
+	
+			//Update curls URLs if value > 0
+			//
+			for (i=0; i<inputs; i++) {
+				if (counter[i] > 0) {
+					syslog ( LOG_DEBUG, "Update CURL URL for GPIO: %d", i);
+					update_curl_handle(vzuuid[i], counter[i], i);
+					counter[i] = 0;
+					value_count++;
 				}
 			}
 	
-		curl_global_cleanup();
+			//Trigger CURL posting to vz middleware	
+			//
+			if (value_count > 0) {	
+				syslog ( LOG_DEBUG, "Sending channel updates to VZ: %d", value_count);
+				if((multihandle_res = curl_multi_perform(multihandle, &running_handles)) != CURLM_OK) {
+					syslog(LOG_ERR, "HTTP_POST(): %s", curl_multi_strerror(multihandle_res) );
+				}
+			}
+		}
+		
+		int ret = poll(fds, inputs, 1000);
+				
+		if(ret>0) {
+
+			syslog ( LOG_DEBUG, "Impulse received");
 	
-return 0;
+			for (i=0; i<inputs; i++) {
+				if (fds[i].revents & POLLPRI) {
+					len = read(fds[i].fd, buffer, BUF_LEN);
+					
+					syslog ( LOG_DEBUG, "Update GPIO: %d", i);
+					
+					//Increase event counter
+					//	
+					counter[i]++;
+				}
+			}
+		}
+	}
+
+	curl_global_cleanup();
+	
+	return 0;
 }
 
