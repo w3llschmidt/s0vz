@@ -223,7 +223,7 @@ void cfile() {
 	else
 		syslog(LOG_INFO, "VzPath:%s", vzpath);
 
-	if (!config_lookup_int(&cfg, "aggmin", &aggmin))
+	if (!config_lookup_float(&cfg, "aggmin", &aggmin))
 	{
 		aggmin = 0;
 		syslog(LOG_INFO, "Aggretation not active!", aggmin);
