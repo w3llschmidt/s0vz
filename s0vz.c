@@ -52,7 +52,8 @@ void daemonShutdown();
 void signal_handler(int sig);
 void daemonize(char *rundir, char *pidfile);
 
-int pidFilehandle, vzport, len, running_handles, rc, aggmin;
+int pidFilehandle, vzport, len, running_handles, rc;
+float aggmin;
 
 const char *vzserver, *vzpath, *vzuuid[64];
 
