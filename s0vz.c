@@ -314,6 +314,10 @@ int main(void) {
 			
 					for (i=0; i<inputs; i++) {
 						if (fds[i].revents & POLLPRI) {
+						/* https://www.kernel.org/doc/Documentation/gpio/sysfs.txt */
+						/* [...] After poll(2) returns, either lseek(2) to 
+						the beginning of the sysfs file [...] */
+						lseek(fds[i].fd, 0, SEEK_SET);
 						len = read(fds[i].fd, buffer, BUF_LEN);
 						update_curl_handle(vzuuid[i]);
 						}
